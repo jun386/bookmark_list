@@ -37,8 +37,8 @@
         </v-flex>
 
         <v-flex xs2>
-          <v-btn style="margin: 20px 0 40px 0;">
-            Bookmarkを追加する  <!-- 追加するモーダルを表示させるボタン（後に実装） -->
+          <v-btn @click="togglePostModal()" style="margin: 20px 0 40px 0;">
+            Bookmarkを追加する
           </v-btn>
           <p style="margin-right: 30px">- Bookmark List -</p>
           <!-- 右側にもリストとしてブックマークをタイトルのみ一覧表示させる -->
@@ -52,6 +52,41 @@
         </v-flex>
       </v-layout>
     </v-container>
+    <v-dialog v-model="dialogPostFlag" width="500px" persistent>
+      <v-card>
+        <v-card-title class="headline blue-grey darken-3 white--text" primary-title>
+          ブックマーク新規投稿
+        </v-card-title>
+
+        <!-- タイトルの入力フォーム -->
+        <v-text-field v-model="postTitle" :counter="50" label="Title" required style='margin:20px;'></v-text-field> 
+
+        <!-- URLの入力フォーム -->
+        <v-text-field v-model="postUrl" label="URL" required style='margin:20px;'></v-text-field> 
+
+        <!-- カテゴリーの入力フォーム -->
+        <v-text-field v-model="postCategory" :counter="50" label="Category" required style='margin:20px;'></v-text-field>
+
+        <!-- カテゴリーを選択できるプルダウン (categoriesForEditの配列の中身を表示) -->
+        <v-select v-model='postCategory' :items="categoriesForEdit" label="Category [select]" style='margin:20px;'></v-select>
+
+        <v-divider></v-divider>
+        <v-card-actions>
+
+          <!-- モーダルを閉じる キャンセルボタン -->
+          <v-btn dark @click="togglePostModal">
+            Cancel
+          </v-btn>
+
+          <v-spacer></v-spacer>
+
+          <!-- postBookmark を呼んで値を送信 (submitボタン) -->
+          <v-btn @click="postBookmark">
+            Add Bookmark
+          </v-btn>
+        </v-card-actions>
+      </v-card>
+    </v-dialog>
   </v-app>
 </template>
 
@@ -62,6 +97,15 @@ export default {
   data: function () {
     return {
       bookmarkList: ['',''],  // 空配列を用意
+      allData: ['',''],       // bookmarkの値を全て代入する空配列をもう一つ用意
+      categories: ['All'],    // カテゴリーを代入する配列 (検索機能で使用)
+      categoriesForEdit: [],  // カテゴリーを代入する配列 (新規投稿や編集フォームで使用)
+      category: 'ALL',        // bookmarkのカテゴリー 初期値は'ALL'
+
+      dialogPostFlag: false,  // モーダル表示：初期値をfalseに設定
+      postTitle: "",          // フォームの中身の初期値は空
+      postUrl: "",            // フォームの中身の初期値は空
+      postCategory: "",       // フォームの中身の初期値は空
     }
   },
   mounted () {
@@ -71,9 +115,46 @@ export default {
     setBookmark: function () {
       axios.get('/api/bookmarks') // axiosを使ってデータを取得
       .then(response => {
-        this.bookmarkList = response.data // axiosで呼び出したAPIの情報をbookmarkListに代入
+        this.allData = response.data
+        this.bookmarkList = this.allData
         }
       );
+      this.listCategories();
+    },
+    listCategories: function() {
+      this.categories = []         // 検索で表示するカテゴリーの選択メニュー
+      this.categoriesForEdit = []  // 新規投稿や編集のフォームに表示する選択メニュー
+      this.categories.push('ALL')  // `ALL`を配列に追加してメニューの一番上に表示させる
+
+      // 配列の要素の数だけ反復処理
+      for (i=0; i<this.allData.length; i++) {
+        // 保存されたカテゴリーの文字列が、i 番目の　allData　のカテゴリーの何文字目で一致するかを返し、
+        // 一致しない場合は -1 を返す
+        // そして結果が -1 で true である場合に処理を行う
+        if (this.categories.indexOf(this.allData[i].category) == -1) {
+          // つまり新しいカテゴリーが保存された時それぞれの配列の中に値を push する
+          this.categories.push(this.allData[i].category)
+          this.categoriesForEdit.push(this.allData[i].category)
+        }
+      }
+    },
+    togglePostModal: function() {
+      // モーダルの開閉状態を操作する。(ONとOFFを切り替える)
+      this.dialogPostFlag = !this.dialogPostFlag
+    },
+
+    postBookmark: function() {
+      // axiosを使って /api/bookmarks コントローラーの create アクションにデータを送信
+      // 第2引数でカラムにそれぞれフォームで受け取ったデータを渡す
+      axios.post('/api/bookmarks', {title:this.postTitle,url:this.postUrl,category:this.postCategory})
+        .then(response => {
+          this.setBookmark();      // setBookmark()を呼び出す
+          this.postTitle = ''      // postTitleの中身を空の状態に戻す
+          this.postUrl = ''        // postUrlの中身を空の状態に戻す
+          this.postCategory = ''   // postCategoryの中身を空の状態に戻す
+        }
+      );
+      this.dialogPostFlag = !this.dialogPostFlag  // モーダルを閉じる
     },
   }
 }
