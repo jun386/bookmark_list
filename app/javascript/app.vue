@@ -13,14 +13,26 @@
           <v-layout>
             <v-flex row wrap style="justify-content: center;">
 
-            <!-- v-forで bookmarkList の配列の中身を取り出してbookmarkに代入し繰り返す -->
+            <!-- bookmark の表示部分 -->
               <v-card v-for="bookmark in bookmarkList" :key="bookmark.id" style="width: 100%">
                 <v-card-title primary-title style="margin-bottom: 15px; width: 100%; padding-bottom: 10px;">
-                  <div style="width: 100%;">
+                <div style="width: 100%;">
                     <div class="headline mb-0" style="display: flex; justify-content: space-between; width: 100%">
                       <p style="font-size: 18px;">
                         {{ bookmark.title }}  <!-- タイトルを表示 -->
                       </p>
+
+                      <!-- 編集用フォームのモーダルを開くボタン -->
+                      <v-tooltip right>
+                        <template v-slot:activator="{ on }">
+                          <!-- togglePutModalに編集するbookmarkのIDを引数で渡す -->
+                          <v-btn light v-on="on" @click="togglePutModal(bookmark.id)" style="margin-bottom: 8px">
+                            <span class="material-icons" style="margin-right: 4px;">create</span>
+                          </v-btn>
+                        </template>
+                        <span>編集する</span>
+                      </v-tooltip>
+
                     </div>
                     <v-divider></v-divider>
                     <div style="font-size: 16px; display: flex; justify-content: space-between; width: 100%">
@@ -87,6 +99,35 @@
         </v-card-actions>
       </v-card>
     </v-dialog>
+
+    <v-dialog v-model="dialogPutFlag" width="500px" persistent>
+      <v-card>
+        <v-card-title class="headline orange darken-4 white--text" primary-title>
+          ブックマーク編集
+        </v-card-title>
+
+        <v-text-field v-model="putTitle" :counter="50" label="Title" required style='margin:20px;'></v-text-field> 
+        <v-text-field v-model="putUrl" label="URL" required style='margin:20px;'></v-text-field> 
+        <v-text-field v-model="putCategory" :counter="50" label="Category" required style='margin:20px;'></v-text-field> 
+        <v-select v-model='putCategory' :items="categoriesForEdit" label="Category [select]" style='margin:20px;'></v-select>
+
+        <v-divider></v-divider>
+        <v-card-actions>
+          <!-- キャンセルボタン cancelメソッドを呼び出す -->
+          <v-btn dark @click="cancel">
+            Cancel
+          </v-btn>
+
+          <v-spacer></v-spacer>
+
+          <!-- 更新ボタン putBookmarkメソッドを呼び出し submit -->
+          <v-btn @click="putBookmark">
+            Update
+          </v-btn>
+        </v-card-actions>
+      </v-card>
+    </v-dialog>
+
   </v-app>
 </template>
 
@@ -106,6 +147,11 @@ export default {
       postTitle: "",          // フォームの中身の初期値は空
       postUrl: "",            // フォームの中身の初期値は空
       postCategory: "",       // フォームの中身の初期値は空
+
+      dialogPutFlag: false,  //編集用モーダルウィンドウ
+      putTitle: '',
+      putUrl: '',
+      putCategory: '',
     }
   },
   mounted () {
@@ -121,6 +167,7 @@ export default {
       );
       this.listCategories();
     },
+
     listCategories: function() {
       this.categories = []         // 検索で表示するカテゴリーの選択メニュー
       this.categoriesForEdit = []  // 新規投稿や編集のフォームに表示する選択メニュー
@@ -138,6 +185,7 @@ export default {
         }
       }
     },
+
     togglePostModal: function() {
       // モーダルの開閉状態を操作する。(ONとOFFを切り替える)
       this.dialogPostFlag = !this.dialogPostFlag
@@ -155,6 +203,34 @@ export default {
         }
       );
       this.dialogPostFlag = !this.dialogPostFlag  // モーダルを閉じる
+    },
+
+    togglePutModal: function(id) {  // 編集するbookmarkのIDを受け取る
+      this.id = id
+
+      // axiosを使って編集対象となるbookmarkの内容を取得し、フォームに表示させる
+      axios.get(`/api/bookmarks/${this.id}.json`)
+        .then(response => {
+          this.putTitle = response.data.title
+          this.putUrl = response.data.url
+          this.putCategory = response.data.category
+        }
+      );
+      // モーダルの開閉状態を操作
+      this.dialogPutFlag = !this.dialogPutFlag
+    },
+
+    putBookmark: function() {
+      axios.put(`/api/bookmarks/${this.id}`, {title:this.putTitle, url:this.putUrl, category:this.putCategory})
+        .then(response => {
+          this.setBookmark();
+        }
+      );
+      this.dialogPutFlag = !this.dialogPutFlag
+    },
+
+    cancel: function() {
+      this.dialogPutFlag = !this.dialogPutFlag
     },
   }
 }

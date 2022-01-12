@@ -16,6 +16,14 @@ class Api::BookmarksController < ApplicationController
     end
   end
 
+  def update
+    @bookmark = Bookmark.find(params[:id])
+    if @bookmark.update_attributes(bookmark_params)
+      render "index", formats: :json, handlers: "jbuilder"
+    else
+      render json: @bookmark.errors, status: :unprocessable_entity
+    end
+  end
 
   private
     def bookmark_params
