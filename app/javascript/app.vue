@@ -13,19 +13,16 @@
           <v-layout>
             <v-flex row wrap style="justify-content: center;">
 
-            <!-- bookmark の表示部分 -->
               <v-card v-for="bookmark in bookmarkList" :key="bookmark.id" style="width: 100%">
                 <v-card-title primary-title style="margin-bottom: 15px; width: 100%; padding-bottom: 10px;">
                 <div style="width: 100%;">
                     <div class="headline mb-0" style="display: flex; justify-content: space-between; width: 100%">
                       <p style="font-size: 18px;">
-                        {{ bookmark.title }}  <!-- タイトルを表示 -->
+                        {{ bookmark.title }}
                       </p>
 
-                      <!-- 編集用フォームのモーダルを開くボタン -->
                       <v-tooltip right>
                         <template v-slot:activator="{ on }">
-                          <!-- togglePutModalに編集するbookmarkのIDを引数で渡す -->
                           <v-btn light v-on="on" @click="togglePutModal(bookmark.id)" style="margin-bottom: 8px">
                             <span class="material-icons" style="margin-right: 4px;">create</span>
                           </v-btn>
@@ -37,8 +34,16 @@
                     <v-divider></v-divider>
                     <div style="font-size: 16px; display: flex; justify-content: space-between; width: 100%">
                       <div>
-                        #{{ bookmark.category }}  <!-- カテゴリーを表示 -->
+                        #{{ bookmark.category }}
                       </div>
+                      <v-tooltip right>
+                        <template v-slot:activator="{ on }">
+                          <v-btn dark v-on="on" @click="toggleDeleteModal(bookmark.id)" style="margin-top: 8px">
+                            <span class="material-icons" style="margin-right: 4px;">delete</span>
+                          </v-btn>
+                        </template>
+                        <span>削除する</span>
+                      </v-tooltip>
                     </div>
                   </div>
                 </v-card-title>
@@ -53,10 +58,9 @@
             Bookmarkを追加する
           </v-btn>
           <p style="margin-right: 30px">- Bookmark List -</p>
-          <!-- 右側にもリストとしてブックマークをタイトルのみ一覧表示させる -->
           <ul v-for="bookmark in bookmarkList" :key="bookmark.id" style="list-style: none; margin-right: 30px">
             <li style="margin-top: 10px;">
-              <p>{{ bookmark.title }}</p>  <!-- タイトルを表示させる -->
+              <p>{{ bookmark.title }}</p>
             </li>
             <hr>
           </ul>
@@ -70,29 +74,23 @@
           ブックマーク新規投稿
         </v-card-title>
 
-        <!-- タイトルの入力フォーム -->
         <v-text-field v-model="postTitle" :counter="50" label="Title" required style='margin:20px;'></v-text-field> 
 
-        <!-- URLの入力フォーム -->
         <v-text-field v-model="postUrl" label="URL" required style='margin:20px;'></v-text-field> 
 
-        <!-- カテゴリーの入力フォーム -->
         <v-text-field v-model="postCategory" :counter="50" label="Category" required style='margin:20px;'></v-text-field>
 
-        <!-- カテゴリーを選択できるプルダウン (categoriesForEditの配列の中身を表示) -->
         <v-select v-model='postCategory' :items="categoriesForEdit" label="Category [select]" style='margin:20px;'></v-select>
 
         <v-divider></v-divider>
         <v-card-actions>
 
-          <!-- モーダルを閉じる キャンセルボタン -->
           <v-btn dark @click="togglePostModal">
             Cancel
           </v-btn>
 
           <v-spacer></v-spacer>
 
-          <!-- postBookmark を呼んで値を送信 (submitボタン) -->
           <v-btn @click="postBookmark">
             Add Bookmark
           </v-btn>
@@ -113,14 +111,12 @@
 
         <v-divider></v-divider>
         <v-card-actions>
-          <!-- キャンセルボタン cancelメソッドを呼び出す -->
           <v-btn dark @click="cancel">
             Cancel
           </v-btn>
 
           <v-spacer></v-spacer>
 
-          <!-- 更新ボタン putBookmarkメソッドを呼び出し submit -->
           <v-btn @click="putBookmark">
             Update
           </v-btn>
@@ -128,6 +124,25 @@
       </v-card>
     </v-dialog>
 
+    <v-dialog v-model="dialogDeleteFlag" width="400">
+      <v-card>
+        <v-card-title class="headline blue-grey darken-3 white--text" primary-title>
+          確認
+        </v-card-title>
+        <br>
+        <br>
+        <v-card-text>
+          <p>本当に削除してもよろしいですか？</p>
+        </v-card-text>
+        <v-divider></v-divider>
+        <v-card-actions>
+          <v-spacer></v-spacer>
+          <v-btn dark class="yellow--text" @click="deleteBookmark()">
+            Delete
+          </v-btn>
+        </v-card-actions>
+      </v-card>
+    </v-dialog>
   </v-app>
 </template>
 
@@ -137,29 +152,31 @@ import axios from 'axios';
 export default {
   data: function () {
     return {
-      bookmarkList: ['',''],  // 空配列を用意
-      allData: ['',''],       // bookmarkの値を全て代入する空配列をもう一つ用意
-      categories: ['All'],    // カテゴリーを代入する配列 (検索機能で使用)
-      categoriesForEdit: [],  // カテゴリーを代入する配列 (新規投稿や編集フォームで使用)
-      category: 'ALL',        // bookmarkのカテゴリー 初期値は'ALL'
+      bookmarkList: ['',''],
+      allData: ['',''],
+      categories: ['All'],
+      categoriesForEdit: [],
+      category: 'ALL',
 
-      dialogPostFlag: false,  // モーダル表示：初期値をfalseに設定
-      postTitle: "",          // フォームの中身の初期値は空
-      postUrl: "",            // フォームの中身の初期値は空
-      postCategory: "",       // フォームの中身の初期値は空
+      dialogPostFlag: false,
+      postTitle: "",
+      postUrl: "",
+      postCategory: "",
 
-      dialogPutFlag: false,  //編集用モーダルウィンドウ
+      dialogPutFlag: false,
       putTitle: '',
       putUrl: '',
       putCategory: '',
+
+      dialogDeleteFlag: false,
     }
   },
   mounted () {
-    this.setBookmark(); // setBookmark() を呼び出す
+    this.setBookmark();
   },
   methods: {
     setBookmark: function () {
-      axios.get('/api/bookmarks') // axiosを使ってデータを取得
+      axios.get('/api/bookmarks')
       .then(response => {
         this.allData = response.data
         this.bookmarkList = this.allData
@@ -169,17 +186,12 @@ export default {
     },
 
     listCategories: function() {
-      this.categories = []         // 検索で表示するカテゴリーの選択メニュー
-      this.categoriesForEdit = []  // 新規投稿や編集のフォームに表示する選択メニュー
-      this.categories.push('ALL')  // `ALL`を配列に追加してメニューの一番上に表示させる
+      this.categories = []
+      this.categoriesForEdit = []
+      this.categories.push('ALL')
 
-      // 配列の要素の数だけ反復処理
       for (i=0; i<this.allData.length; i++) {
-        // 保存されたカテゴリーの文字列が、i 番目の　allData　のカテゴリーの何文字目で一致するかを返し、
-        // 一致しない場合は -1 を返す
-        // そして結果が -1 で true である場合に処理を行う
         if (this.categories.indexOf(this.allData[i].category) == -1) {
-          // つまり新しいカテゴリーが保存された時それぞれの配列の中に値を push する
           this.categories.push(this.allData[i].category)
           this.categoriesForEdit.push(this.allData[i].category)
         }
@@ -187,28 +199,24 @@ export default {
     },
 
     togglePostModal: function() {
-      // モーダルの開閉状態を操作する。(ONとOFFを切り替える)
       this.dialogPostFlag = !this.dialogPostFlag
     },
 
     postBookmark: function() {
-      // axiosを使って /api/bookmarks コントローラーの create アクションにデータを送信
-      // 第2引数でカラムにそれぞれフォームで受け取ったデータを渡す
       axios.post('/api/bookmarks', {title:this.postTitle,url:this.postUrl,category:this.postCategory})
         .then(response => {
-          this.setBookmark();      // setBookmark()を呼び出す
-          this.postTitle = ''      // postTitleの中身を空の状態に戻す
-          this.postUrl = ''        // postUrlの中身を空の状態に戻す
-          this.postCategory = ''   // postCategoryの中身を空の状態に戻す
+          this.setBookmark();
+          this.postTitle = ''
+          this.postUrl = ''
+          this.postCategory = ''
         }
       );
-      this.dialogPostFlag = !this.dialogPostFlag  // モーダルを閉じる
+      this.dialogPostFlag = !this.dialogPostFlag
     },
 
-    togglePutModal: function(id) {  // 編集するbookmarkのIDを受け取る
+    togglePutModal: function(id) {
       this.id = id
 
-      // axiosを使って編集対象となるbookmarkの内容を取得し、フォームに表示させる
       axios.get(`/api/bookmarks/${this.id}.json`)
         .then(response => {
           this.putTitle = response.data.title
@@ -216,7 +224,6 @@ export default {
           this.putCategory = response.data.category
         }
       );
-      // モーダルの開閉状態を操作
       this.dialogPutFlag = !this.dialogPutFlag
     },
 
@@ -231,6 +238,20 @@ export default {
 
     cancel: function() {
       this.dialogPutFlag = !this.dialogPutFlag
+    },
+
+    toggleDeleteModal: function(id) {
+      this.id = id
+      this.dialogDeleteFlag = !this.dialogDeleteFlag
+    },
+
+    deleteBookmark: function() {
+      axios.delete(`/api/bookmarks/${this.id}`)
+        .then(response => {
+          this.setBookmark();
+        }
+      );
+      this.dialogDeleteFlag = !this.dialogDeleteFlag
     },
   }
 }
