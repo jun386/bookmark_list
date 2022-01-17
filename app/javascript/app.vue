@@ -3,7 +3,16 @@
     <v-container style="height: 1000px; max-width: 2400px; padding: 0 20px;">
       <v-layout>
         <v-flex xs2 style="justify-content: center; padding: 20px 5px 0 5px">
-          <h3>サイドメニュー表示</h3>
+          <h3>フリーワードで探す</h3>
+          <v-text-field v-model="searchWord" @keyup="searchBookmarks" label="Input Keyword" style='margin-top:4px'></v-text-field>
+          <br>
+          <h3>カテゴリーごとに絞る</h3>
+          <v-select
+            v-model='category'
+            :items="categories"
+            label="Category"
+            @change="searchBookmarks">
+          </v-select>
         </v-flex>
 
         <v-flex xs8>
@@ -175,6 +184,8 @@ export default {
       putCategory: '',
 
       dialogDeleteFlag: false,
+
+      searchWord: '',
     }
   },
   mounted () {
@@ -192,6 +203,7 @@ export default {
         }
       );
       this.listCategories();
+      this.searchBookmarks();
     },
 
     listCategories: function() {
@@ -262,6 +274,25 @@ export default {
       );
       this.dialogDeleteFlag = !this.dialogDeleteFlag
     },
+    searchBookmarks: function() {
+      if (this.category == 'ALL') {
+        this.bookmarkList = []
+        for (i=0; i<this.allData.length; i++) {
+          if ((this.allData[i].title.indexOf(this.searchWord) !== -1) || (this.allData[i].category.indexOf(this.searchWord) !== -1)) {
+            this.bookmarkList.push(this.allData[i])
+          }
+        }
+      } else if (this.category != '') {
+        this.bookmarkList = []
+        for (i=0; i<this.allData.length; i++) {
+          if (this.allData[i].category == this.category) {
+            if ((this.allData[i].title.indexOf(this.searchWord) !== -1) || (this.allData[i].category.indexOf(this.searchWord) !== -1)) {
+              this.bookmarkList.push(this.allData[i])
+            }
+          }
+        }   
+      }
+    }
   }
 }
 </script>
