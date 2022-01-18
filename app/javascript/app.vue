@@ -26,9 +26,9 @@
                   <v-card-title primary-title style="margin-bottom: 15px; width: 100%; padding-bottom: 10px;">
                   <div style="width: 100%;">
                       <div class="headline mb-0" style="display: flex; justify-content: space-between; width: 100%">
-                        <p style="font-size: 18px;">
+                        <a v-bind:href="bookmark.url" target="_blank" rel="noopener noreferrer" style="font-size: 18px;">
                           {{ bookmark.title }}
-                        </p>
+                        </a>
 
                         <v-tooltip right>
                           <template v-slot:activator="{ on }">
