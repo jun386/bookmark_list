@@ -1,5 +1,6 @@
 <template>
   <v-app id="app">
+    <Loading v-show="isLoading"></Loading>
     <v-container style="height: 1000px; max-width: 2400px; padding: 0 20px;">
       <v-layout>
         <v-flex xs2 style="justify-content: center; padding: 20px 5px 0 5px">
@@ -157,6 +158,7 @@
 
 <script>
 import draggable from 'vuedraggable'
+import Loading from './components/Loading'
 import axios from 'axios';
 
 axios.defaults.headers.common = {
@@ -167,6 +169,8 @@ axios.defaults.headers.common = {
 export default {
   data: function () {
     return {
+      isLoading: true,
+
       bookmarkList: ['',''],
       allData: ['',''],
       categories: ['All'],
@@ -189,9 +193,16 @@ export default {
     }
   },
   mounted () {
+    axios.get("/api/bookmarks")
+    .then(response => {
+        this.allData = response.data;
+        this.isLoading = false;
+      }
+    );
     this.setBookmark();
   },
   components: {
+    Loading,
     draggable,
   },
   methods: {
