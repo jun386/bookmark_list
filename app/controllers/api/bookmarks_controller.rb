@@ -3,8 +3,17 @@ class Api::BookmarksController < ApplicationController
   protect_from_forgery :except => [:create, :update, :destroy]
 
   def index
-    @bookmarks = Bookmark.order('created_at DESC')
-    render "index", formats: :json, handlers: "jbuilder"
+    page = params[:page] || 1
+    per = params[:per] || 30
+
+    @bookmarks = Bookmark.order('created_at DESC').page(page).per(per)
+    total_pages = @bookmarks.total_pages
+
+    response = {
+      bookmarks: @bookmarks,
+      total_pages: total_pages,
+    }
+    render json: response
   end
 
   def create
