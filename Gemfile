@@ -33,7 +33,6 @@ gem 'faker'
 gem 'kaminari'
 
 gem "devise"
-gem "devise_token_auth"
 
 gem "rack-cors"
 
