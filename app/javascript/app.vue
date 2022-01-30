@@ -34,7 +34,7 @@
                         <v-tooltip right>
                           <template v-slot:activator="{ on }">
                             <v-btn light v-on="on" @click="togglePutModal(bookmark.id)" style="margin-bottom: 8px">
-                              <span class="material-icons" style="margin-right: 4px;">create</span>
+                              <span class="material-icons" style="margin-right: 4px;">edit</span>
                             </v-btn>
                           </template>
                           <span>編集する</span>
