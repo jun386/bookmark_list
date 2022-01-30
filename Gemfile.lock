@@ -70,10 +70,6 @@ GEM
       railties (>= 4.1.0)
       responders
       warden (~> 1.2.3)
-    devise_token_auth (1.2.0)
-      bcrypt (~> 3.0)
-      devise (> 3.5.2, < 5)
-      rails (>= 4.2.0, < 6.2)
     erubi (1.10.0)
     faker (2.19.0)
       i18n (>= 1.6, < 2)
@@ -212,7 +208,6 @@ DEPENDENCIES
   bootsnap (>= 1.4.2)
   byebug
   devise
-  devise_token_auth
   faker
   jbuilder (~> 2.7)
   kaminari
