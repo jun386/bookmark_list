@@ -16,6 +16,11 @@ class Api::BookmarksController < ApplicationController
     render json: response
   end
 
+  def show
+    @bookmark = Bookmark.find(params[:id])
+    render "show", formats: :json, handlers: "jbuilder"
+  end
+
   def create
     @bookmark = Bookmark.new(bookmark_params)
     if @bookmark.save
