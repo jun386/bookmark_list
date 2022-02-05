@@ -154,4 +154,16 @@ body {
 
  #error_explanation {
   display: contents;
-}
+ }
+
+ .delete-user-btn {
+   text-decoration: none;
+   display: inline-block;
+   color: #222;
+   font-size: 20px;
+   border: none;
+   width: 300px;
+   background-color: #ef9df4;
+   margin-bottom: 15px;
+   text-align: center;
+ }
