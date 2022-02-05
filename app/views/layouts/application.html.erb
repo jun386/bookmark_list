@@ -1,28 +1,28 @@
 <!DOCTYPE html>
-<html>
+<html lang="ja">
   <head>
-    <title>BookmarkList</title>
+    <meta charset="UTF-8" />
+    <title>Bookmark List</title>
     <%= csrf_meta_tags %>
     <%= csp_meta_tag %>
-
     <%= stylesheet_link_tag 'application', media: 'all', 'data-turbolinks-track': 'reload' %>
     <%= javascript_pack_tag 'application', 'data-turbolinks-track': 'reload' %>
+    <link href="https://fonts.googleapis.com/css2?family=Material+Icons" rel="stylesheet">
   </head>
 
   <body>
     <header>
-      <nav>
+      <h3 class="title">Bookmark List</h3>
+      <div class="header-link">
         <% if user_signed_in? %>
-          <strong><%= current_user.name %></strong>
-          <%= link_to 'プロフィール変更', edit_user_registration_path %>
-          <%= link_to 'ログアウト', destroy_user_session_path, method: :delete %>
+          <div class="user-link user-name"><%= current_user.name %></div>
+          <%= link_to "ログアウト", destroy_user_session_path, method: :delete, class: "user-link" %>
         <% else %>
-          <%= link_to '新規登録', new_user_registration_path %>
-          <%= link_to 'ログイン', new_user_session_path %>
+          <%= link_to "新規登録", new_user_registration_path, class: "user-link" %>
+          <%= link_to "ログイン", new_user_session_path, class: "user-link" %>
         <% end %>
-      </nav>
+      </div>
     </header>
-
     <%= yield %>
   </body>
 </html>
