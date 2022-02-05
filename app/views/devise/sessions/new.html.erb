@@ -9,7 +9,6 @@
       <%= flash[:alert] %>
     </div>
 
-    
     <%= form_with model: @user, url: user_session_path, id: 'new_user', class: 'new_user', local: true do |f| %>
       <%= render "devise/shared/error_messages", resource: resource %>
       <div class="field">

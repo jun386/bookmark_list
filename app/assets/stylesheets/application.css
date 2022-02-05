@@ -151,3 +151,7 @@ body {
    width: 300px;
    background-color: #ef9df4;
  }
+
+ #error_explanation {
+  display: contents;
+}
