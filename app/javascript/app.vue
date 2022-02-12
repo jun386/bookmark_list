@@ -46,29 +46,7 @@
         </v-flex>
       </v-layout>
 
-        <v-dialog v-model="dialogPostFlag" width="500px" persistent>
-          <v-card>
-            <v-card-title class="headline blue-grey darken-3 white--text" primary-title>
-              Create Form
-            </v-card-title>
-
-            <v-text-field v-model="postTitle" :counter="50" label="Title" required style='margin:20px;'></v-text-field> 
-            <v-text-field v-model="postUrl" label="URL" required style='margin:20px;'></v-text-field> 
-            <v-text-field v-model="postCategory" :counter="50" label="Category" required style='margin:20px;'></v-text-field> 
-            <v-select v-model='postCategory' :items="categoriesForEdit" label="Category [select]" style='margin:20px;'></v-select>
-
-            <v-divider></v-divider>
-            <v-card-actions>
-              <v-btn dark @click="togglePostModal">
-                Cancel
-              </v-btn>
-              <v-spacer></v-spacer>
-              <v-btn @click="postBookmark">
-                Add Bookmark
-              </v-btn>
-            </v-card-actions>
-          </v-card>
-        </v-dialog>
+        <AddDialog :dialogPostFlag="dialogPostFlag" :categoriesForEdit="categoriesForEdit" @post-cancel-click="togglePostModal" @post-click="postBookmark"></AddDialog>
 
         <v-dialog v-model="dialogPutFlag" width="500px" persistent>
           <v-card>
@@ -123,6 +101,7 @@
 <script>
 import Loading from './components/Loading'
 import BookmarkList from './components/BookmarkList'
+import AddDialog from './components/AddDialog'
 import axios from 'axios';
 axios.defaults.headers.common = {
     'X-Requested-With': 'XMLHttpRequest',
@@ -165,6 +144,7 @@ export default {
   components: {
     Loading,
     BookmarkList,
+    AddDialog,
   },
   methods: {
     setBookmark: function () {
@@ -194,8 +174,11 @@ export default {
     togglePostModal: function() {
       this.dialogPostFlag = !this.dialogPostFlag
     },
-    postBookmark: function() {
-      axios.post('/api/bookmarks', {title:this.postTitle,url:this.postUrl,category:this.postCategory})
+    postBookmark: function(...args) {
+      this.postTitle = args[0]
+      this.postUrl = args[1]
+      this.postCategory = args[2]
+      axios.post('/api/bookmarks', {title:this.postTitle, url:this.postUrl, category:this.postCategory})
         .then(response => {
           this.setBookmark();
           this.postTitle = ''
