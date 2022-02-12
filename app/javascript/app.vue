@@ -61,7 +61,7 @@
 
             <v-divider></v-divider>
             <v-card-actions>
-              <v-btn dark @click="cancel">
+              <v-btn dark @click="editCancel">
                 Cancel
               </v-btn>
               <v-spacer></v-spacer>
@@ -72,27 +72,7 @@
           </v-card>
         </v-dialog>
 
-        <v-dialog v-model="dialogDeleteFlag" width="400">
-          <v-card>
-            <v-card-title class="headline blue-grey darken-3 white--text" primary-title>
-              Confirm
-            </v-card-title>
-            <br>
-            <br>
-            <v-card-text>
-              <p>本当に削除してもよろしいですか？</p>
-            </v-card-text>
-
-            <v-divider></v-divider>
-
-            <v-card-actions>
-              <v-spacer></v-spacer>
-              <v-btn dark class="yellow--text" @click="deleteBookmark()">
-                Delete
-              </v-btn>
-            </v-card-actions>
-          </v-card>
-        </v-dialog>
+        <DeleteDialog :dialogDeleteFlag="dialogDeleteFlag" @delete-click="deleteBookmark" @delete-cancel-click="deleteCancel"></DeleteDialog>
 
     </v-container>
   </v-app> 
@@ -102,6 +82,7 @@
 import Loading from './components/Loading'
 import BookmarkList from './components/BookmarkList'
 import AddDialog from './components/AddDialog'
+import DeleteDialog from './components/DeleteDialog'
 import axios from 'axios';
 axios.defaults.headers.common = {
     'X-Requested-With': 'XMLHttpRequest',
@@ -145,6 +126,7 @@ export default {
     Loading,
     BookmarkList,
     AddDialog,
+    DeleteDialog,
   },
   methods: {
     setBookmark: function () {
@@ -207,7 +189,7 @@ export default {
       );
       this.dialogPutFlag = !this.dialogPutFlag
     },
-    cancel: function() {
+    editCancel: function() {
       this.dialogPutFlag = !this.dialogPutFlag
     },
     deleteBookmark: function() {
@@ -220,6 +202,9 @@ export default {
     },
     toggleDeleteModal: function(id) {
       this.id = id
+      this.dialogDeleteFlag = !this.dialogDeleteFlag
+    },
+    deleteCancel: function() {
       this.dialogDeleteFlag = !this.dialogDeleteFlag
     },
     abstruct: function() {
