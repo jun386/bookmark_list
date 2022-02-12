@@ -37,29 +37,7 @@
 
         <AddDialog :dialogPostFlag="dialogPostFlag" :categoriesForEdit="categoriesForEdit" @post-cancel-click="togglePostModal" @post-click="postBookmark"></AddDialog>
 
-        <v-dialog v-model="dialogPutFlag" width="500px" persistent>
-          <v-card>
-            <v-card-title class="headline orange darken-4 white--text" primary-title>
-              Edit Form
-            </v-card-title>
-
-            <v-text-field v-model="putTitle" :counter="50" label="Title" required style='margin:20px;'></v-text-field> 
-            <v-text-field v-model="putUrl" label="URL" required style='margin:20px;'></v-text-field> 
-            <v-text-field v-model="putCategory" :counter="50" label="Category" required style='margin:20px;'></v-text-field> 
-            <v-select v-model='putCategory' :items="categoriesForEdit" label="Category [select]" style='margin:20px;'></v-select>
-
-            <v-divider></v-divider>
-            <v-card-actions>
-              <v-btn dark @click="editCancel">
-                Cancel
-              </v-btn>
-              <v-spacer></v-spacer>
-              <v-btn @click="putBookmark">
-                Update
-              </v-btn>
-            </v-card-actions>
-          </v-card>
-        </v-dialog>
+        <EditDialog :dialogPutFlag="dialogPutFlag" :categoriesForEdit="categoriesForEdit" :putTitle="putTitle" :putUrl="putUrl" :putCategory="putCategory" @edit-click="putBookmark" @edit-cancel-click="editCancel" @change-title="changeTitle" @change-url="changeUrl" @change-category="changeCategory"></EditDialog>
 
         <DeleteDialog :dialogDeleteFlag="dialogDeleteFlag" @delete-click="deleteBookmark" @delete-cancel-click="deleteCancel"></DeleteDialog>
 
@@ -72,6 +50,7 @@ import Loading from './components/Loading'
 import BookmarkList from './components/BookmarkList'
 import Sidebar from './components/Sidebar'
 import AddDialog from './components/AddDialog'
+import EditDialog from './components/EditDialog'
 import DeleteDialog from './components/DeleteDialog'
 import axios from 'axios';
 axios.defaults.headers.common = {
@@ -117,6 +96,7 @@ export default {
     BookmarkList,
     Sidebar,
     AddDialog,
+    EditDialog,
     DeleteDialog,
   },
   methods: {
@@ -182,6 +162,15 @@ export default {
     },
     editCancel: function() {
       this.dialogPutFlag = !this.dialogPutFlag
+    },
+    changeTitle: function(newTitle) {
+      this.putTitle = newTitle
+    },
+    changeUrl: function(newUrl) {
+      this.putUrl = newUrl
+    },
+    changeCategory: function(newCategory) {
+      this.putCategory = newCategory
     },
     deleteBookmark: function() {
       axios.delete(`/api/bookmarks/${this.id}`)

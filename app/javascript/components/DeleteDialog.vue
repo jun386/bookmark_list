@@ -28,7 +28,7 @@
 <script>
 export default {
   name: 'DeleteDialog',
-  props: ['dialogDeleteFlag', 'categoriesForEdit'],
+  props: ['dialogDeleteFlag'],
   methods: {
     deleteBookmark() {
       this.$emit('delete-click')
