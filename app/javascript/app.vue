@@ -3,18 +3,7 @@
     <Loading v-show="isLoading"></Loading>
     <v-container style="height: 1000px; max-width: 2400px; padding: 0 20px;">
       <v-layout>
-        <v-flex xs2 style="justify-content: center; padding: 20px 5px 0 5px">
-          <h3>フリーワードで探す</h3>
-          <v-text-field v-model="searchWord" @keyup="abstruct" label="Input Keyword" style='margin-top:4px'></v-text-field>
-          <br>
-          <h3>カテゴリーごとに絞る</h3>
-          <v-select
-            v-model='category'
-            :items="categories"
-            label="Category"
-            v-on:change="abstruct">
-          </v-select>
-        </v-flex>
+        <Search :searchWord="searchWord" :category="category" :categories="categories" @change-search-word="changeSearchWord" @change-search-category="changeSearchCategory" @search="abstruct"></Search>
 
         <v-flex xs8>
           <div style="width: 100%; margin: 5px 0 20px 0; display: flex; justify-content: center;">
@@ -41,6 +30,7 @@
 
 <script>
 import Loading from './components/Loading'
+import Search from './components/Search'
 import BookmarkList from './components/BookmarkList'
 import Pagination from './components/Pagination'
 import Sidebar from './components/Sidebar'
@@ -88,6 +78,7 @@ export default {
   },
   components: {
     Loading,
+    Search,
     BookmarkList,
     Pagination,
     Sidebar,
@@ -205,6 +196,12 @@ export default {
           }
         }   
       }
+    },
+    changeSearchWord: function(newSearchWord) {
+      this.searchWord = newSearchWord
+    },
+    changeSearchCategory: function(newSearchCategory) {
+      this.category = newSearchCategory
     }
   }
 }
