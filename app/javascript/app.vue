@@ -23,13 +23,7 @@
         
           <BookmarkList :bookmarkList="bookmarkList" :itemsPerPage="itemsPerPage" @put-click="togglePutModal" @delete-click="toggleDeleteModal"></BookmarkList>
 
-          <div class="text-xs-center" style="margin: 20px 0 40px 0;">
-            <v-pagination
-              v-model="currentPage"
-              :length="totalPages"
-              @input="setBookmark"
-            ></v-pagination>
-          </div>
+          <Pagination :currentPage="currentPage" :totalPages="totalPages" @pagination="setBookmark" @change-page="changePage"></Pagination>
         </v-flex>
 
         <Sidebar :bookmarkList="bookmarkList" @add-click="togglePostModal"></Sidebar>
@@ -48,6 +42,7 @@
 <script>
 import Loading from './components/Loading'
 import BookmarkList from './components/BookmarkList'
+import Pagination from './components/Pagination'
 import Sidebar from './components/Sidebar'
 import AddDialog from './components/AddDialog'
 import EditDialog from './components/EditDialog'
@@ -94,6 +89,7 @@ export default {
   components: {
     Loading,
     BookmarkList,
+    Pagination,
     Sidebar,
     AddDialog,
     EditDialog,
@@ -186,6 +182,9 @@ export default {
     },
     deleteCancel: function() {
       this.dialogDeleteFlag = !this.dialogDeleteFlag
+    },
+    changePage: function(newPage) {
+      this.currentPage = newPage
     },
     abstruct: function() {
       var i = 0;
