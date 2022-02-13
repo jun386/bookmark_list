@@ -3,165 +3,40 @@
     <Loading v-show="isLoading"></Loading>
     <v-container style="height: 1000px; max-width: 2400px; padding: 0 20px;">
       <v-layout>
-        <v-flex xs2 style="justify-content: center; padding: 20px 5px 0 5px">
-          <h3>フリーワードで探す</h3>
-          <v-text-field v-model="searchWord" @keyup="abstruct" label="Input Keyword" style='margin-top:4px'></v-text-field>
-          <br>
-          <h3>カテゴリーごとに絞る</h3>
-          <v-select
-            v-model='category'
-            :items="categories"
-            label="Category"
-            v-on:change="abstruct">
-          </v-select>
-        </v-flex>
+        <Search :searchWord="searchWord" :category="category" :categories="categories" @change-search-word="changeSearchWord" @change-search-category="changeSearchCategory" @search="abstruct"></Search>
 
         <v-flex xs8>
           <div style="width: 100%; margin: 5px 0 20px 0; display: flex; justify-content: center;">
             <h1>Bookmark 一覧</h1>
           </div>
-          
-          <v-layout>
-            <v-flex row wrap style="justify-content: center;">
-              <draggable v-model="bookmarkList" style="margin: 0 25px; width: 80%; cursor: pointer;">
-                <v-card v-for="bookmark in bookmarkList" :key="bookmark.id" :items-per-page="itemsPerPage" style="width: 100%">
-                  <v-card-title primary-title style="margin-bottom: 15px; width: 100%; padding-bottom: 10px;">
-                    <div style="width: 100%;">
-                      <div class="headline mb-0" style="display: flex; justify-content: space-between; width: 100%">
-                        <a v-bind:href="bookmark.url" target="_blank" rel="noopener noreferrer" style="font-size: 18px;">
-                          {{ bookmark.title }}
-                        </a>
-                        
-                        <v-tooltip right>
-                          <template v-slot:activator="{ on }">
-                            <v-btn light v-on="on" @click="togglePutModal(bookmark.id)" style="margin-bottom: 8px">
-                              <span class="material-icons" style="margin-right: 4px;">create</span>
-                            </v-btn>
-                          </template>
-                          <span>編集する</span>
-                        </v-tooltip>
+        
+          <BookmarkList :bookmarkList="bookmarkList" :itemsPerPage="itemsPerPage" @put-click="togglePutModal" @delete-click="toggleDeleteModal"></BookmarkList>
 
-                      </div>
-                      <v-divider></v-divider>
-                      <div style="font-size: 16px; display: flex; justify-content: space-between; width: 100%">
-                        <div>#{{ bookmark.category }}</div>
-                        
-                        <v-tooltip right>
-                          <template v-slot:activator="{ on }">
-                            <v-btn dark v-on="on" @click="toggleDeleteModal(bookmark.id)" style="margin-top: 8px">
-                              <span class="material-icons" style="margin-right: 4px;">delete</span>
-                            </v-btn>
-                          </template>
-                          <span>削除する</span>
-                        </v-tooltip>
-
-                      </div>
-                    </div>
-                  </v-card-title>
-                </v-card>
-              </draggable>
-            </v-flex>
-          </v-layout>
-          <div class="text-xs-center" style="margin: 20px 0 40px 0;">
-            <v-pagination
-              v-model="currentPage"
-              :length="totalPages"
-              @input="setBookmark"
-            ></v-pagination>
-          </div>
+          <Pagination :currentPage="currentPage" :totalPages="totalPages" @pagination="setBookmark" @change-page="changePage"></Pagination>
         </v-flex>
 
-        <v-flex xs2>
-          <v-btn @click="togglePostModal()" style="margin: 20px 0 40px 0;">
-            <span class="material-icons" style="margin-right: 4px;">add</span>Bookmarkを追加する
-          </v-btn>
-          <p style="margin-right: 30px">- Bookmark List -</p>
-          <ul v-for="bookmark in bookmarkList" :key="bookmark.id" style="list-style: none; margin-right: 30px">
-            <li style="margin-top: 10px;">
-              <a v-bind:href="bookmark.url" target="_blank" rel="noopener noreferrer">{{ bookmark.title }}</a>
-            </li>
-            <hr>
-          </ul>
-        </v-flex>
+        <Sidebar :bookmarkList="bookmarkList" @add-click="togglePostModal"></Sidebar>
       </v-layout>
 
-        <v-dialog v-model="dialogPostFlag" width="500px" persistent>
-          <v-card>
-            <v-card-title class="headline blue-grey darken-3 white--text" primary-title>
-              Create Form
-            </v-card-title>
+        <AddDialog :dialogPostFlag="dialogPostFlag" :categoriesForEdit="categoriesForEdit" @post-cancel-click="togglePostModal" @post-click="postBookmark"></AddDialog>
 
-            <v-text-field v-model="postTitle" :counter="50" label="Title" required style='margin:20px;'></v-text-field> 
-            <v-text-field v-model="postUrl" label="URL" required style='margin:20px;'></v-text-field> 
-            <v-text-field v-model="postCategory" :counter="50" label="Category" required style='margin:20px;'></v-text-field> 
-            <v-select v-model='postCategory' :items="categoriesForEdit" label="Category [select]" style='margin:20px;'></v-select>
+        <EditDialog :dialogPutFlag="dialogPutFlag" :categoriesForEdit="categoriesForEdit" :putTitle="putTitle" :putUrl="putUrl" :putCategory="putCategory" @edit-click="putBookmark" @edit-cancel-click="editCancel" @change-title="changeTitle" @change-url="changeUrl" @change-category="changeCategory"></EditDialog>
 
-            <v-divider></v-divider>
-            <v-card-actions>
-              <v-btn dark @click="togglePostModal">
-                Cancel
-              </v-btn>
-              <v-spacer></v-spacer>
-              <v-btn @click="postBookmark">
-                Add Bookmark
-              </v-btn>
-            </v-card-actions>
-          </v-card>
-        </v-dialog>
-
-        <v-dialog v-model="dialogPutFlag" width="500px" persistent>
-          <v-card>
-            <v-card-title class="headline orange darken-4 white--text" primary-title>
-              Edit Form
-            </v-card-title>
-
-            <v-text-field v-model="putTitle" :counter="50" label="Title" required style='margin:20px;'></v-text-field> 
-            <v-text-field v-model="putUrl" label="URL" required style='margin:20px;'></v-text-field> 
-            <v-text-field v-model="putCategory" :counter="50" label="Category" required style='margin:20px;'></v-text-field> 
-            <v-select v-model='putCategory' :items="categoriesForEdit" label="Category [select]" style='margin:20px;'></v-select>
-
-            <v-divider></v-divider>
-            <v-card-actions>
-              <v-btn dark @click="cancel">
-                Cancel
-              </v-btn>
-              <v-spacer></v-spacer>
-              <v-btn @click="putBookmark">
-                Update
-              </v-btn>
-            </v-card-actions>
-          </v-card>
-        </v-dialog>
-
-        <v-dialog v-model="dialogDeleteFlag" width="400">
-          <v-card>
-            <v-card-title class="headline blue-grey darken-3 white--text" primary-title>
-              Confirm
-            </v-card-title>
-            <br>
-            <br>
-            <v-card-text>
-              <p>本当に削除してもよろしいですか？</p>
-            </v-card-text>
-
-            <v-divider></v-divider>
-
-            <v-card-actions>
-              <v-spacer></v-spacer>
-              <v-btn dark class="yellow--text" @click="deleteBookmark()">
-                Delete
-              </v-btn>
-            </v-card-actions>
-          </v-card>
-        </v-dialog>
+        <DeleteDialog :dialogDeleteFlag="dialogDeleteFlag" @delete-click="deleteBookmark" @delete-cancel-click="deleteCancel"></DeleteDialog>
 
     </v-container>
   </v-app> 
 </template>
 
 <script>
-import draggable from 'vuedraggable'
 import Loading from './components/Loading'
+import Search from './components/Search'
+import BookmarkList from './components/BookmarkList'
+import Pagination from './components/Pagination'
+import Sidebar from './components/Sidebar'
+import AddDialog from './components/AddDialog'
+import EditDialog from './components/EditDialog'
+import DeleteDialog from './components/DeleteDialog'
 import axios from 'axios';
 axios.defaults.headers.common = {
     'X-Requested-With': 'XMLHttpRequest',
@@ -203,7 +78,13 @@ export default {
   },
   components: {
     Loading,
-    draggable,
+    Search,
+    BookmarkList,
+    Pagination,
+    Sidebar,
+    AddDialog,
+    EditDialog,
+    DeleteDialog,
   },
   methods: {
     setBookmark: function () {
@@ -233,8 +114,11 @@ export default {
     togglePostModal: function() {
       this.dialogPostFlag = !this.dialogPostFlag
     },
-    postBookmark: function() {
-      axios.post('/api/bookmarks', {title:this.postTitle,url:this.postUrl,category:this.postCategory})
+    postBookmark: function(...args) {
+      this.postTitle = args[0]
+      this.postUrl = args[1]
+      this.postCategory = args[2]
+      axios.post('/api/bookmarks', {title:this.postTitle, url:this.postUrl, category:this.postCategory})
         .then(response => {
           this.setBookmark();
           this.postTitle = ''
@@ -263,8 +147,17 @@ export default {
       );
       this.dialogPutFlag = !this.dialogPutFlag
     },
-    cancel: function() {
+    editCancel: function() {
       this.dialogPutFlag = !this.dialogPutFlag
+    },
+    changeTitle: function(newTitle) {
+      this.putTitle = newTitle
+    },
+    changeUrl: function(newUrl) {
+      this.putUrl = newUrl
+    },
+    changeCategory: function(newCategory) {
+      this.putCategory = newCategory
     },
     deleteBookmark: function() {
       axios.delete(`/api/bookmarks/${this.id}`)
@@ -277,6 +170,12 @@ export default {
     toggleDeleteModal: function(id) {
       this.id = id
       this.dialogDeleteFlag = !this.dialogDeleteFlag
+    },
+    deleteCancel: function() {
+      this.dialogDeleteFlag = !this.dialogDeleteFlag
+    },
+    changePage: function(newPage) {
+      this.currentPage = newPage
     },
     abstruct: function() {
       var i = 0;
@@ -297,6 +196,12 @@ export default {
           }
         }   
       }
+    },
+    changeSearchWord: function(newSearchWord) {
+      this.searchWord = newSearchWord
+    },
+    changeSearchCategory: function(newSearchCategory) {
+      this.category = newSearchCategory
     }
   }
 }
