@@ -10,7 +10,7 @@
             <h1>Bookmark 一覧</h1>
           </div>
         
-          <BookmarkList :bookmarkList="bookmarkList" :itemsPerPage="itemsPerPage" @put-click="togglePutModal" @delete-click="toggleDeleteModal"></BookmarkList>
+          <BookmarkList :bookmarkList="bookmarkList" :itemsPerPage="itemsPerPage" @change-bookmark-list="changeBookmarkList" @put-click="togglePutModal" @delete-click="toggleDeleteModal"></BookmarkList>
 
           <Pagination :currentPage="currentPage" :totalPages="totalPages" @pagination="setBookmark" @change-page="changePage"></Pagination>
         </v-flex>
@@ -110,6 +110,9 @@ export default {
           this.categoriesForEdit.push(this.allData[i].category)
         }
       }
+    },
+    changeBookmarkList: function(newBookmarkList) {
+      this.bookmarkList = newBookmarkList
     },
     togglePostModal: function() {
       this.dialogPostFlag = !this.dialogPostFlag

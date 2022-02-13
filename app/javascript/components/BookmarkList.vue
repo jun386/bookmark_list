@@ -1,8 +1,8 @@
 <template>
   <v-layout>
     <v-flex row wrap style="justify-content: center;">
-      <draggable v-model="bookmarkList" style="margin: 0 25px; width: 80%; cursor: pointer;">
-        <v-card v-for="bookmark in bookmarkList" :key="bookmark.id" :items-per-page="itemsPerPage" style="width: 100%">
+      <draggable v-model="bookmarkListComponent" style="margin: 0 25px; width: 80%; cursor: pointer;">
+        <v-card v-for="bookmark in bookmarkListComponent" :key="bookmark.id" :items-per-page="itemsPerPage" style="width: 100%">
           <v-card-title primary-title style="margin-bottom: 15px; width: 100%; padding-bottom: 10px;">
             <div style="width: 100%;">
               <div class="headline mb-0" style="display: flex; justify-content: space-between; width: 100%">
@@ -50,6 +50,16 @@ export default {
   props: ['bookmarkList', 'itemsPerPage'],
   components: {
     draggable,
+  },
+  computed: {
+    bookmarkListComponent: {
+      get() {
+        return this.bookmarkList
+      },
+      set(newBookmarkList) {
+        this.$emit('change-bookmark-list', newBookmarkList)
+      }
+    }
   },
   methods: {
     togglePutModal(id) {
