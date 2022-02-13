@@ -51,4 +51,4 @@ production:
   <<: *default
   database: bookmark_list_production
   username: bookmark_list
-  password: <%= ENV['BOOKMARK_LIST_DATABASE_PASSWORD'] %>
+  password: <%= ENV['DATABASE_PASSWORD'] %>
