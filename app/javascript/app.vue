@@ -18,7 +18,7 @@
         <Sidebar :bookmarkList="bookmarkList" @add-click="togglePostModal"></Sidebar>
       </v-layout>
 
-        <AddDialog :dialogPostFlag="dialogPostFlag" :categoriesForEdit="categoriesForEdit" @post-cancel-click="togglePostModal" @post-click="postBookmark"></AddDialog>
+        <AddDialog :dialogPostFlag="dialogPostFlag" :categoriesForEdit="categoriesForEdit" :postTitle="postTitle" :postUrl="postUrl" :postCategory="postCategory" @post-cancel-click="togglePostModal" @post-click="postBookmark" @change-post-title="changePostTitle" @change-post-url="changePostUrl" @change-post-category="changePostCategory"></AddDialog>
 
         <EditDialog :dialogPutFlag="dialogPutFlag" :categoriesForEdit="categoriesForEdit" :putTitle="putTitle" :putUrl="putUrl" :putCategory="putCategory" @edit-click="putBookmark" @edit-cancel-click="editCancel" @change-title="changeTitle" @change-url="changeUrl" @change-category="changeCategory"></EditDialog>
 
@@ -117,10 +117,7 @@ export default {
     togglePostModal: function() {
       this.dialogPostFlag = !this.dialogPostFlag
     },
-    postBookmark: function(...args) {
-      this.postTitle = args[0]
-      this.postUrl = args[1]
-      this.postCategory = args[2]
+    postBookmark: function() {
       axios.post('/api/bookmarks', {title:this.postTitle, url:this.postUrl, category:this.postCategory})
         .then(response => {
           this.setBookmark();
@@ -130,6 +127,15 @@ export default {
         }
       );
       this.dialogPostFlag = !this.dialogPostFlag
+    },
+    changePostTitle: function(newTitle) {
+      this.postTitle = newTitle
+    },
+    changePostUrl: function(newUrl) {
+      this.postUrl = newUrl
+    },
+    changePostCategory: function(newCategory) {
+      this.postCategory = newCategory
     },
     togglePutModal: function(id) {
       this.id = id

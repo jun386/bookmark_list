@@ -5,10 +5,10 @@
         Create Form
       </v-card-title>
 
-      <v-text-field v-model="postTitle" :counter="50" label="Title" required style='margin:20px;'></v-text-field> 
-      <v-text-field v-model="postUrl" label="URL" required style='margin:20px;'></v-text-field> 
-      <v-text-field v-model="postCategory" :counter="50" label="Category" required style='margin:20px;'></v-text-field> 
-      <v-select v-model='postCategory' :items="categoriesForEdit" label="Category [select]" style='margin:20px;'></v-select>
+      <v-text-field v-model="postTitleDialog" :counter="50" label="Title" required style='margin:20px;'></v-text-field> 
+      <v-text-field v-model="postUrlDialog" label="URL" required style='margin:20px;'></v-text-field> 
+      <v-text-field v-model="postCategoryDialog" :counter="50" label="Category" required style='margin:20px;'></v-text-field> 
+      <v-select v-model='postCategoryDialog' :items="categoriesForEdit" label="Category [select]" style='margin:20px;'></v-select>
 
       <v-divider></v-divider>
       <v-card-actions>
@@ -26,21 +26,40 @@
 
 <script>
 export default {
-  data: function () {
-    return {
-      postTitle: "",
-      postUrl: "",
-      postCategory: "",
+  name: 'AddDialog',
+  props: ['dialogPostFlag', 'postTitle', 'postUrl', 'postCategory', 'categoriesForEdit'],
+  computed: {
+    postTitleDialog: {
+      get() {
+        return this.postTitle
+      },
+      set(newTitle) {
+        this.$emit('change-post-title', newTitle)
+      }
+    },
+    postUrlDialog: {
+      get() {
+        return this.postUrl
+      },
+      set(newUrl) {
+        this.$emit('change-post-url', newUrl)
+      }
+    },
+    postCategoryDialog: {
+      get() {
+        return this.postCategory
+      },
+      set(newCategory) {
+        this.$emit('change-post-category', newCategory)
+      }
     }
   },
-  name: 'AddDialog',
-  props: ['dialogPostFlag', 'categoriesForEdit'],
   methods: {
     togglePostModal() {
       this.$emit('post-cancel-click')
     },
     postBookmark() {
-      this.$emit('post-click', this.postTitle, this.postUrl, this.postCategory)
+      this.$emit('post-click')
     }
   }
 }
