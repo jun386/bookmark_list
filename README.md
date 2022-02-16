@@ -44,3 +44,6 @@
 - MySQL 8.0
 - Docker/Docker-compose
 - Heroku
+
+### ER図
+![ER図](/doc/erd.png)
