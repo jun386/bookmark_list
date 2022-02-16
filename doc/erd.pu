@@ -1,0 +1,23 @@
+@startuml
+title BookmarkList ER図
+
+entity users as "ユーザー" {
+  + id [PK]
+  --
+  name [ユーザー名]
+  email [メールアドレス]
+  password [パスワード]
+}
+
+entity bookmarks as "ブックマーク" {
+  + id [PK]
+  --
+  user_id
+  title [ブックマーク名]
+  url [URL]
+  category [カテゴリー名]
+}
+
+users ||-o{ bookmarks
+
+@enduml

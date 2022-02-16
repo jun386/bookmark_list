@@ -1,24 +1,49 @@
 # README
 
-This README would normally document whatever steps are necessary to get the
-application up and running.
+## Bookmark List
 
-Things you may want to cover:
+### 概要
+- ブックマークを管理するアプリケーション
 
-* Ruby version
+### URL・テストアカウント
+- https://bookmark-list123.herokuapp.com/
 
-* System dependencies
+- メールアドレス：test1@example.com
 
-* Configuration
+- パスワード：password
 
-* Database creation
+### トップ画像
+![トップ画像](/doc/BookmarkList_トップ画像.png)
 
-* Database initialization
+### 機能
+- ユーザー管理機能
+  - 「devise」を用いたユーザー管理をしています。
 
-* How to run the test suite
+- ブックマーク一覧表示機能
+  - 「Vue.Draggable」を使用し、ドラッグ＆ドロップで表示の並び替えができます。
+  - 「kaminari」を使用し、10件以上ブックマークがある場合はページネーションをしています。
+  - ブックマークに登録したURLへ遷移することができます。
 
-* Services (job queues, cache servers, search engines, etc.)
+- ブックマーク新規投稿機能
+  - 「ブックマークを追加する」ボタンで、追加用のモーダルが開き、フォームが表示されます。
 
-* Deployment instructions
+- ブックマーク更新機能
+  - 各ブックマークのペンのアイコンから、編集用のモーダルが開きます。
 
-* ...
+- ブックマーク削除機能
+  - 各ブックマークのゴミ箱のアイコンから、削除用のモーダルが開きます。
+
+- 検索・カテゴリー絞り込み機能
+  - トップページの左上のフォームから、ブックマークの検索、カテゴリー絞り込みができます。
+
+### 使用技術
+- Ruby 2.6.9
+- Ruby on Rails 6.0.4
+- Vue.js 2.6.14
+- Vuetify 2.6.2
+- MySQL 8.0
+- Docker/Docker-compose
+- Heroku
+
+### ER図
+![ER図](/doc/erd.png)
