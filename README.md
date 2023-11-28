@@ -6,7 +6,7 @@
 - ブックマークを管理するアプリケーション
 
 ### URL・テストアカウント
-- https://bookmark-list123.herokuapp.com/
+- https://bookmark-list.onrender.com
 
 - メールアドレス：test1@example.com
 
@@ -37,7 +37,7 @@
   - トップページの左上のフォームから、ブックマークの検索、カテゴリー絞り込みができます。
 
 ### 使用技術
-- Ruby 2.6.9
+- Ruby 2.6.10
 - Ruby on Rails 6.0.4
 - Vue.js 2.6.14
 - Vuetify 2.6.2
