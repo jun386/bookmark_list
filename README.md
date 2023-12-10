@@ -43,7 +43,7 @@
 - Vuetify 2.6.2
 - MySQL 8.0
 - Docker/Docker-compose
-- Heroku
+- Render
 
 ### ER図
 ![ER図](/doc/erd.png)
